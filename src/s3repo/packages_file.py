@@ -1,8 +1,10 @@
+from __future__ import absolute_import
 import gzip
 import StringIO
 from s3repo.field_set import FieldSet
 
 from boto.s3.key import Key
+from six.moves import map
 
 def GzipCompress(str):
   out_stream = StringIO.StringIO()

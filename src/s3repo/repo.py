@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import hashlib
 import os
 import subprocess
@@ -57,9 +58,9 @@ class Repo(object):
 
     metadata["Filename"] = relative_path
     metadata["Size"] = str(os.stat(path).st_size)
-    metadata["MD5"] = hashlib.md5(file(path, "rb").read()).hexdigest()
-    metadata["SHA1"] = hashlib.sha1(file(path, "rb").read()).hexdigest()
-    metadata["SHA256"] = hashlib.sha256(file(path, "rb").read()).hexdigest()
+    metadata["MD5"] = hashlib.md5(open(path, "rb").read()).hexdigest()
+    metadata["SHA1"] = hashlib.sha1(open(path, "rb").read()).hexdigest()
+    metadata["SHA256"] = hashlib.sha256(open(path, "rb").read()).hexdigest()
 
     if metadata["Architecture"] == "all":
       architectures = self.architectures[:]
