@@ -42,6 +42,8 @@ class Repo(object):
         "/Packages.gz", packages_gz_str)
       release.Store(self.bucket, self.prefix + "dists/" + self.codename +
         "/Release", acl=self.acl)
+      release.Store(self.bucket, self.prefix + "dists/" + self.codename +
+        "/InRelease", acl=self.acl, inline_gpg=True)
 
     for file_to_delete in files_to_delete:
       self.bucket.delete_key(self.prefix + file_to_delete)
@@ -92,6 +94,8 @@ class Repo(object):
         "/Packages.gz", packages_gz_str)
       release.Store(self.bucket, self.prefix + "dists/" + self.codename +
         "/Release", acl=self.acl)
+      release.Store(self.bucket, self.prefix + "dists/" + self.codename +
+        "/InRelease", acl=self.acl, inline_gpg=True)
 
     for file_to_delete in files_to_delete:
       self.bucket.delete_key(self.prefix + file_to_delete)
@@ -122,3 +126,5 @@ class Repo(object):
         "/Packages", "")
     release.Store(self.bucket, self.prefix + "dists/" + self.codename +
       "/Release", acl=self.acl)
+    release.Store(self.bucket, self.prefix + "dists/" + self.codename +
+      "/InRelease", acl=self.acl, inline_gpg=True)

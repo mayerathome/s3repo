@@ -36,15 +36,20 @@ class ReleaseFile(object):
   def __str__(self):
     return str(self.field_set)
 
-  def Store(self, bucket, bucket_path, acl):
+  def Store(self, bucket, bucket_path, acl, inline_gpg=False):
     release_key = Key(bucket=bucket, name=bucket_path)
     release_str = str(self)
-    release_key.set_contents_from_string(release_str, policy=acl)
 
-    release_gpg_str, _ = subprocess.Popen(["gpg", "--detach-sign", "--armor"],
-      stdout=subprocess.PIPE, stdin=subprocess.PIPE).communicate(release_str)
-    release_gpg_key = Key(bucket=bucket, name=bucket_path + ".gpg")
-    release_gpg_key.set_contents_from_string(release_gpg_str, policy=acl)
+    if inline_gpg:
+      release_gpg_str, _ = subprocess.Popen(["gpg", "--clear-sign", "--armor"],
+        stdout=subprocess.PIPE, stdin=subprocess.PIPE).communicate(release_str)
+      release_key.set_contents_from_string(release_gpg_str, policy=acl)
+    else:
+      release_key.set_contents_from_string(release_str, policy=acl)
+      release_gpg_str, _ = subprocess.Popen(["gpg", "--detach-sign", "--armor"],
+        stdout=subprocess.PIPE, stdin=subprocess.PIPE).communicate(release_str)
+      release_gpg_key = Key(bucket=bucket, name=bucket_path + ".gpg")
+      release_gpg_key.set_contents_from_string(release_gpg_str, policy=acl)
 
   @classmethod
   def Load(cls, bucket, bucket_path):
