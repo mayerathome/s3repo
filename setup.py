@@ -21,5 +21,5 @@ setup(
       "s3repo = s3repo.command:Main",
     ],
   },
-  requires=["six", "boto"],
+  requires=["boto"],
 )
