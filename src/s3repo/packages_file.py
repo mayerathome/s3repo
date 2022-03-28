@@ -1,19 +1,19 @@
 from __future__ import absolute_import
 import gzip
-import StringIO
+import io
 from s3repo.field_set import FieldSet
 
 from boto.s3.key import Key
 
-def GzipCompress(str):
-  out_stream = StringIO.StringIO()
-  gzip.GzipFile("stdin", "w", 9, out_stream).write(str)
+def GzipCompress(contents):
+  out_stream = io.BytesIO()
+  gzip.GzipFile(fileobj=out_stream, mode="wb", compresslevel=9).write(contents)
   return out_stream.getvalue()
 
 class PackagesFile(object):
   def __init__(self, contents):
     self.packages = []
-    for package_str in contents.split("\n\n"):
+    for package_str in contents.decode("utf-8").split("\n\n"):
       if package_str == "":
         continue
       self.packages.append(FieldSet(package_str))
@@ -24,14 +24,14 @@ class PackagesFile(object):
 
   def Store(self, bucket, bucket_path, acl):
     key = Key(bucket=bucket, name=bucket_path)
-    self_str = str(self)
-    key.set_contents_from_string(self_str, policy=acl)
+    contents = str(self).encode("utf-8")
+    key.set_contents_from_string(contents, policy=acl)
 
     key = Key(bucket=bucket, name=bucket_path + ".gz")
-    self_str_gz = GzipCompress(self_str)
-    key.set_contents_from_string(self_str_gz, policy=acl)
+    contents_gz = GzipCompress(contents)
+    key.set_contents_from_string(contents_gz, policy=acl)
 
-    return self_str, self_str_gz
+    return contents, contents_gz
 
   def AddPackage(self, metadata):
     self.packages.append(metadata)

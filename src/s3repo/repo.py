@@ -31,15 +31,15 @@ class Repo(object):
 
       files_to_delete.extend(packages.RemovePackage(package_name))
 
-      packages_str, packages_gz_str = packages.Store(self.bucket,
+      packages_contents, packages_contents_gz = packages.Store(self.bucket,
         self.prefix + packages_file_relative_path, acl=self.acl)
 
       release = ReleaseFile.Load(self.bucket, self.prefix + "dists/" +
         self.codename + "/Release")
       release.UpdateFile(self.component + "/" + "binary-" + architecture + \
-        "/Packages", packages_str)
+        "/Packages", packages_contents)
       release.UpdateFile(self.component + "/" + "binary-" + architecture + \
-        "/Packages.gz", packages_gz_str)
+        "/Packages.gz", packages_contents_gz)
       release.Store(self.bucket, self.prefix + "dists/" + self.codename +
         "/Release", acl=self.acl)
       release.Store(self.bucket, self.prefix + "dists/" + self.codename +
@@ -50,7 +50,7 @@ class Repo(object):
 
   def AddPackage(self, path, remove_old_versions=False):
     metadata = FieldSet(subprocess.check_output(["dpkg-deb", "-I", path,
-      "control"]))
+      "control"]).decode("utf-8"))
 
     package = metadata["Package"]
     relative_path = "pool/" + self.component + "/" + package[0] + "/" + \
@@ -83,15 +83,15 @@ class Repo(object):
 
       packages.AddPackage(metadata)
 
-      packages_str, packages_gz_str = packages.Store(self.bucket,
+      packages_contents, packages_contents_gz = packages.Store(self.bucket,
         self.prefix + packages_file_relative_path, acl=self.acl)
 
       release = ReleaseFile.Load(self.bucket, self.prefix + "dists/" +
         self.codename + "/Release")
       release.UpdateFile(self.component + "/" + "binary-" + architecture + \
-        "/Packages", packages_str)
+        "/Packages", packages_contents)
       release.UpdateFile(self.component + "/" + "binary-" + architecture + \
-        "/Packages.gz", packages_gz_str)
+        "/Packages.gz", packages_contents_gz)
       release.Store(self.bucket, self.prefix + "dists/" + self.codename +
         "/Release", acl=self.acl)
       release.Store(self.bucket, self.prefix + "dists/" + self.codename +
@@ -106,7 +106,7 @@ class Repo(object):
     distributions["Components"] = self.component
     distributions["Architectures"] = " ".join(self.architectures)
     for line in subprocess.check_output(["gpg", "--list-secret-keys",
-        "--with-colons"]).splitlines():
+        "--with-colons"]).decode("utf-8").splitlines():
       parts = line.split(":")
       distributions["SignWith"] = parts[4][-8:]
     Key(bucket=self.bucket, name=self.prefix + "conf/distributions")\
@@ -123,7 +123,7 @@ class Repo(object):
       Key(bucket=self.bucket, name=self.prefix + packages_file_relative_path)\
         .set_contents_from_string("", policy=self.acl)
       release.UpdateFile(self.component + "/" + "binary-" + architecture + \
-        "/Packages", "")
+        "/Packages", b"")
     release.Store(self.bucket, self.prefix + "dists/" + self.codename +
       "/Release", acl=self.acl)
     release.Store(self.bucket, self.prefix + "dists/" + self.codename +
