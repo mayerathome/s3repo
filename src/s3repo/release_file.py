@@ -41,7 +41,7 @@ class ReleaseFile(object):
     contents = str(self).encode("utf-8")
 
     if inline_gpg:
-      release_gpg_str, _ = subprocess.Popen(["gpg", "--clear-sign", "--armor"],
+      release_gpg_str, _ = subprocess.Popen(["gpg", "--clearsign", "--armor"],
         stdout=subprocess.PIPE, stdin=subprocess.PIPE).communicate(contents)
       release_key.set_contents_from_string(release_gpg_str, policy=acl)
     else:
