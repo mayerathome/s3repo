@@ -10,7 +10,7 @@ from s3repo.repo import Repo
 def Main(args=sys.argv[1:]):
   try:
     DEFAULT_CODENAME = subprocess.check_output(["lsb_release", "--codename",
-      "--short"]).strip()
+      "--short"]).decode("utf-8").strip()
   except subprocess.CalledProcessError:
     DEFAULT_CODENAME = None
 

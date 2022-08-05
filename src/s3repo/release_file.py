@@ -8,8 +8,8 @@ from s3repo.field_set import FieldSet
 
 
 class ReleaseFile(object):
-  def __init__(self, str):
-    self.field_set = FieldSet(str)
+  def __init__(self, contents):
+    self.field_set = FieldSet(contents.decode("utf-8"))
 
   def UpdateFile(self, relative_path, contents):
     size = str(len(contents))
@@ -38,16 +38,16 @@ class ReleaseFile(object):
 
   def Store(self, bucket, bucket_path, acl, inline_gpg=False):
     release_key = Key(bucket=bucket, name=bucket_path)
-    release_str = str(self)
+    contents = str(self).encode("utf-8")
 
     if inline_gpg:
-      release_gpg_str, _ = subprocess.Popen(["gpg", "--clear-sign", "--armor"],
-        stdout=subprocess.PIPE, stdin=subprocess.PIPE).communicate(release_str)
+      release_gpg_str, _ = subprocess.Popen(["gpg", "--clearsign", "--armor"],
+        stdout=subprocess.PIPE, stdin=subprocess.PIPE).communicate(contents)
       release_key.set_contents_from_string(release_gpg_str, policy=acl)
     else:
-      release_key.set_contents_from_string(release_str, policy=acl)
+      release_key.set_contents_from_string(contents, policy=acl)
       release_gpg_str, _ = subprocess.Popen(["gpg", "--detach-sign", "--armor"],
-        stdout=subprocess.PIPE, stdin=subprocess.PIPE).communicate(release_str)
+        stdout=subprocess.PIPE, stdin=subprocess.PIPE).communicate(contents)
       release_gpg_key = Key(bucket=bucket, name=bucket_path + ".gpg")
       release_gpg_key.set_contents_from_string(release_gpg_str, policy=acl)
 
