@@ -51,11 +51,12 @@ def Main(args=sys.argv[1:]):
 
   # `remove` subcommand
   sub_parser = sub_parsers.add_parser("remove")
+  sub_parser.add_argument("--version")
   sub_parser.add_argument("package_name", nargs="+")
 
   def RemoveMain(repo, options):
     for package_name in options.package_name:
-      repo.RemovePackage(package_name=package_name)
+      repo.RemovePackage(package_name=package_name, version=options.version)
   sub_parser.set_defaults(function=RemoveMain)
 
   options = parser.parse_args(args)

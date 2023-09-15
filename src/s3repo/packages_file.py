@@ -36,9 +36,11 @@ class PackagesFile(object):
   def AddPackage(self, metadata):
     self.packages.append(metadata)
 
-  def RemovePackage(self, name):
+  def RemovePackage(self, name, version=None):
     for package in self.packages[:]:
       if package["Package"] == name:
+        if version and package["Version"] != version:
+          continue
         self.packages.remove(package)
         yield package["Filename"]
 
