@@ -20,7 +20,7 @@ class Repo(object):
     self.codename = codename
     self.architectures = architectures
 
-  def RemovePackage(self, package_name):
+  def RemovePackage(self, package_name, version=None):
     files_to_delete = []
     for architecture in self.architectures:
       packages_file_relative_path = "dists/" + self.codename + "/" + \
@@ -29,7 +29,7 @@ class Repo(object):
       packages = PackagesFile.Load(self.bucket,
         self.prefix + packages_file_relative_path)
 
-      files_to_delete.extend(packages.RemovePackage(package_name))
+      files_to_delete.extend(packages.RemovePackage(package_name, version=version))
 
       packages_contents, packages_contents_gz = packages.Store(self.bucket,
         self.prefix + packages_file_relative_path, acl=self.acl)
