@@ -15,7 +15,7 @@ class FieldSet(object):
         self.fields.append((key, value))
       else:
         key, value = line.split(":", 1)
-        self.fields.append((key, value.lstrip()))
+        self.fields.append((key, value.lstrip().rstrip()))
 
   def __str__(self):
     rv = ""

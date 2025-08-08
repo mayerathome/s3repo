@@ -11,7 +11,7 @@ def Main(args=sys.argv[1:]):
   try:
     DEFAULT_CODENAME = subprocess.check_output(["lsb_release", "--codename",
       "--short"]).decode("utf-8").strip()
-  except subprocess.CalledProcessError:
+  except (subprocess.CalledProcessError, FileNotFoundError):
     DEFAULT_CODENAME = None
 
   parser = argparse.ArgumentParser(
